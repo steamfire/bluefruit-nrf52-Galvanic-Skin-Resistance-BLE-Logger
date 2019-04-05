@@ -11,6 +11,8 @@
 
 // BLE Client Current Time Service
 BLEClientCts  bleCTime;
+BLEDis bledis;    // DIS (Device Information Service) helper class instance
+BLEBas blebas;    // BAS (Battery Service) helper class instance
 
 // Realtime Clock
 RTC_PCF8523 rtc;

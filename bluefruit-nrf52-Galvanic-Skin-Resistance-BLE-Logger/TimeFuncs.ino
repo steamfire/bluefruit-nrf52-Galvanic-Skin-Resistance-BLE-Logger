@@ -67,11 +67,22 @@ void setupTime() {
   Bluefruit.begin();
   // Set max power. Accepted values are: -40, -30, -20, -16, -12, -8, -4, 0, 4
   Bluefruit.setTxPower(4);
-  Bluefruit.setName("Bluefruit52");
+  Bluefruit.setName("Dan nrf52 GSR");
   Bluefruit.setConnectCallback(connect_callback);
   Bluefruit.setDisconnectCallback(disconnect_callback);
     // Turn off Blue LED
   Bluefruit.autoConnLed(false);
+
+    // Configure and Start the Device Information Service
+  Serial.println("Configuring the Device Information Service");
+  bledis.setManufacturer("Adafruit Industries");
+  bledis.setModel("Bluefruit Feather52");
+  bledis.begin();
+
+    // Start the BLE Battery Service and set it to 100%
+  Serial.println("Configuring the Battery Service");
+  blebas.begin();
+  blebas.write(100);
 
   // Configure CTS client
   bleCTime.begin();

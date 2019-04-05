@@ -27,55 +27,55 @@ int readVBAT(void) {
 }
 
 uint8_t mvToPercent(float mvolts) {
-    uint8_t battery_level;
+  uint8_t battery_level;
 
-    if (mvolts >= 3000)
-    {
-        battery_level = 100;
-    }
-    else if (mvolts > 2900)
-    {
-        battery_level = 100 - ((3000 - mvolts) * 58) / 100;
-    }
-    else if (mvolts > 2740)
-    {
-        battery_level = 42 - ((2900 - mvolts) * 24) / 160;
-    }
-    else if (mvolts > 2440)
-    {
-        battery_level = 18 - ((2740 - mvolts) * 12) / 300;
-    }
-    else if (mvolts > 2100)
-    {
-        battery_level = 6 - ((2440 - mvolts) * 6) / 340;
-    }
-    else
-    {
-        battery_level = 0;
-    }
+  if (mvolts >= 3000)
+  {
+    battery_level = 100;
+  }
+  else if (mvolts > 2900)
+  {
+    battery_level = 100 - ((3000 - mvolts) * 58) / 100;
+  }
+  else if (mvolts > 2740)
+  {
+    battery_level = 42 - ((2900 - mvolts) * 24) / 160;
+  }
+  else if (mvolts > 2440)
+  {
+    battery_level = 18 - ((2740 - mvolts) * 12) / 300;
+  }
+  else if (mvolts > 2100)
+  {
+    battery_level = 6 - ((2440 - mvolts) * 6) / 340;
+  }
+  else
+  {
+    battery_level = 0;
+  }
 
-    return battery_level;
+  return battery_level;
 }
 
 
 float battCheck() {
 
-// Get an average reading:
-   long sum = 0; 
+  // Get an average reading:
+  long sum = 0;
   for (int i = 0; i < 17; i++)    //Average the 10 measurements to remove the glitch
   {
-   // Get a raw ADC reading
-   int rawBattValue = readVBAT();
+    // Get a raw ADC reading
+    int rawBattValue = readVBAT();
     sum += rawBattValue;
     delay(5);
   }
-   int vbat_raw = sum / 17;
-   
+  int vbat_raw = sum / 17;
+
   // Get a raw ADC reading
- /// int vbat_raw = readVBAT();
+  /// int vbat_raw = readVBAT();
 
   // Convert from raw mv to percentage (based on LIPO chemistry)
-   battPct = mvToPercent(vbat_raw * VBAT_MV_PER_LSB);
+  battPct = mvToPercent(vbat_raw * VBAT_MV_PER_LSB);
 
   // Convert the raw value to compensated mv, taking the resistor-
   // divider into account (providing the actual LIPO voltage)
@@ -83,23 +83,23 @@ float battCheck() {
   // VBAT voltage divider is 2M + 0.806M, which needs to be added back
   float vbat_mv = (float)vbat_raw * VBAT_MV_PER_LSB * VBAT_DIVIDER_COMP;
 
-/*
-  // Display the results
-  Serial.print("ADC = ");
-  Serial.print(vbat_raw * VBAT_MV_PER_LSB);
-  Serial.print(" mV (");
-  Serial.print(vbat_raw);
-  Serial.print(") ");
-  Serial.print("LIPO = ");
-  Serial.print(vbat_mv);
-  Serial.print(" mV (");
-  Serial.print(vbat_per);
-  Serial.println("%)");
+  /*
+    // Display the results
+    Serial.print("ADC = ");
+    Serial.print(vbat_raw * VBAT_MV_PER_LSB);
+    Serial.print(" mV (");
+    Serial.print(vbat_raw);
+    Serial.print(") ");
+    Serial.print("LIPO = ");
+    Serial.print(vbat_mv);
+    Serial.print(" mV (");
+    Serial.print(vbat_per);
+    Serial.println("%)");
 
   */
-  
- 
-  
+
+  blebas.write(battPct);
+
   float vbattVolts = vbat_mv / 1000;
   //delay(1000);
   return vbattVolts;
