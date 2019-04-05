@@ -92,10 +92,34 @@ void setupTime() {
   // Or change the time manually etc ...
   bleCTime.setAdjustCallback(cts_adjust_callback);
 
+  
+  // Setup the Automation IO service using
+  // BLEService and BLECharacteristic classes
+  Serial.println("Configuring the Analog IO Service");
+  setupAIO();
+
   // Set up and start advertising
   startAdv();
 }
 
+
+void setupAIO(){
+    aios.begin();
+      // Note: You must call .begin() on the BLEService before calling .begin() on
+  // any characteristic(s) within that service definition.. Calling .begin() on
+  // a BLECharacteristic will cause it to be added to the last BLEService that
+  // was 'begin()'ed!
+
+  aioc.setProperties(CHR_PROPS_NOTIFY);
+  aioc.setPermission(SECMODE_OPEN, SECMODE_NO_ACCESS);
+  aioc.setFixedLen(2);
+  aioc.setCccdWriteCallback(cccd_callback);  // Optionally capture CCCD updates
+  aioc.begin();
+  uint8_t aiodata[2] = { 0, 0 };  // Set the first data to zero
+  aioc.notify(aiodata, 2);          
+
+
+}
 
 void startAdv(void)
 {
@@ -125,6 +149,8 @@ void startAdv(void)
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds
 }
 
+
+
 void setRTCLoop() {
   for (int i = 0; i < 10; i++) {
     //Print the RTC time before the bleCTime is checked
@@ -150,6 +176,25 @@ void setRTCLoop() {
 
 
   }
+}
+
+void cccd_callback(BLECharacteristic& chr, uint16_t cccd_value)
+{
+    // Display the raw request packet
+    Serial.print("CCCD Updated: ");
+    //Serial.printBuffer(request->data, request->len);
+    Serial.print(cccd_value);
+    Serial.println("");
+ 
+    // Check the characteristic this CCCD update is associated with in case
+    // this handler is used for multiple CCCD records.
+    if (chr.uuid == aioc.uuid) {
+        if (chr.notifyEnabled()) {
+            Serial.println("Analog 'Notify' enabled");
+        } else {
+            Serial.println("Analog 'Notify' disabled");
+        }
+    }
 }
 
 void connect_callback(uint16_t conn_handle)

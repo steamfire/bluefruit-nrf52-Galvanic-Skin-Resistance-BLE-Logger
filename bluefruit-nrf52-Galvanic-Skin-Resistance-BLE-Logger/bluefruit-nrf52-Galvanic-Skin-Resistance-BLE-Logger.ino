@@ -9,17 +9,33 @@
 #define GSR_Pin A0
 #define interval_Logging_Seconds 10
 
+
+/* Automation IO Service Definitions
+   Automation IO Service:  0x1815
+   Analog Read Characteristic: 0x2A58
+*/
+BLEService        aios = BLEService(0x1815);
+BLECharacteristic aioc = BLECharacteristic(0x2A58);
+
 // BLE Client Current Time Service
 BLEClientCts  bleCTime;
 BLEDis bledis;    // DIS (Device Information Service) helper class instance
 BLEBas blebas;    // BAS (Battery Service) helper class instance
 
+
 // Realtime Clock
 RTC_PCF8523 rtc;
 
-int gsr_measured = 0;
+uint16_t gsr_measured = 0;
+uint16_t gsr_old = 0;
 float battVolts = 0;
 uint8_t battPct = 0;
+
+// Advanced function prototypes
+void startAdv(void);
+void setupAIO(void);
+void connect_callback(uint16_t conn_handle);
+void disconnect_callback(uint16_t conn_handle, uint8_t reason);
 
 
 void setup()
@@ -52,6 +68,14 @@ void setup()
 void loop()
 {
   gsr_measured = getGSR();
+  if (gsr_old == gsr_measured) {
+    ; // do nothing special
+  } else {
+    //Update the BLE Analog data 
+    uint8_t aiodata[2] = {  lowByte(gsr_measured), highByte(gsr_measured) };
+    aioc.notify(aiodata, 2);                    // Use .write for init data
+    gsr_old = gsr_measured;  
+  }
   battVolts = battCheck();
   //delay(1000);
 }

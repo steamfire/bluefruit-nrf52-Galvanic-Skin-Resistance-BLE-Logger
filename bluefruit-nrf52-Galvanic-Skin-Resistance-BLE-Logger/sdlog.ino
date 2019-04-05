@@ -107,12 +107,12 @@ void analogLog() {
 
 int getGSR() {
   long sum = 0;
-  for (int i = 0; i < 200; i++)    //Average the 10 measurements to remove the glitch
+  for (int i = 0; i < 500; i++)    //Average the 500 measurements to remove the glitch
   {
     int sensorValue = analogRead(GSR_Pin);
     sum += sensorValue;
     delay(5);
   }
-  int gsr_average = sum / 200;
+  int gsr_average = sum / 500;
   return gsr_average;
 }
