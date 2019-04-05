@@ -70,6 +70,8 @@ void setupTime() {
   Bluefruit.setName("Bluefruit52");
   Bluefruit.setConnectCallback(connect_callback);
   Bluefruit.setDisconnectCallback(disconnect_callback);
+    // Turn off Blue LED
+  Bluefruit.autoConnLed(false);
 
   // Configure CTS client
   bleCTime.begin();
@@ -113,7 +115,7 @@ void startAdv(void)
 }
 
 void setRTCLoop() {
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 10; i++) {
     //Print the RTC time before the bleCTime is checked
 
     rtcPrintTime();
