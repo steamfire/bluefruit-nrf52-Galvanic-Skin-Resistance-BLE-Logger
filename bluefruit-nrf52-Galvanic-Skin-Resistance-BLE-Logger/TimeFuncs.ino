@@ -199,12 +199,16 @@ void cccd_callback(BLECharacteristic& chr, uint16_t cccd_value)
 
 void connect_callback(uint16_t conn_handle)
 {
-  Serial.println("Connected");
+  char central_name[32] = { 0 };
+  Bluefruit.Gap.getPeerName(conn_handle, central_name, sizeof(central_name));
 
-  Serial.print("Discovering CTS ... ");
+  Serial.print("Connected to ");
+  Serial.println(central_name);
+  
+ // Serial.print("Discovering CTS ... ");
   if ( bleCTime.discover(conn_handle) )
   {
-    Serial.println("Discovered");
+    Serial.println("Discovered CTS");
 
     // iOS requires pairing to work, it makes sense to request security here as well
     Serial.print("Attempting to PAIR with the iOS device, please press PAIR on your phone ... ");
