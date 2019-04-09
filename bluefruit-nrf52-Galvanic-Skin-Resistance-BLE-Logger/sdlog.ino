@@ -35,7 +35,7 @@ void setupSDLog(void) {
     error(2);
   }
 
-  strcpy(filename, "/ANALOG00.TXT");
+  strcpy(filename, "/ANALOG00.CSV");
   for (uint8_t i = 0; i < 100; i++) {
     filename[7] = '0' + i / 10;
     filename[8] = '0' + i % 10;
