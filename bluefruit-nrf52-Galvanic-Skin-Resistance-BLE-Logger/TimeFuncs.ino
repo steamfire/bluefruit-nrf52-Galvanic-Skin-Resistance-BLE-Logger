@@ -68,9 +68,9 @@ void setupTime() {
   // Set max power. Accepted values are: -40, -30, -20, -16, -12, -8, -4, 0, 4
   Bluefruit.setTxPower(4);
   Bluefruit.setName("Dan nrf52 GSR");
-  Bluefruit.setConnectCallback(connect_callback);
-  Bluefruit.setDisconnectCallback(disconnect_callback);
     // Turn off Blue LED
+  Bluefruit.Periph.setConnectCallback(connect_callback);
+  Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
   Bluefruit.autoConnLed(false);
 
     // Configure and Start the Device Information Service
@@ -178,7 +178,7 @@ void setRTCLoop() {
   }
 }
 
-void cccd_callback(BLECharacteristic& chr, uint16_t cccd_value)
+void cccd_callback(uint16_t conn_hdl, BLECharacteristic* chr, uint16_t cccd_value)
 {
     // Display the raw request packet
     Serial.print("CCCD Updated: ");
@@ -188,19 +188,22 @@ void cccd_callback(BLECharacteristic& chr, uint16_t cccd_value)
  
     // Check the characteristic this CCCD update is associated with in case
     // this handler is used for multiple CCCD records.
-    if (chr.uuid == aioc.uuid) {
-        if (chr.notifyEnabled()) {
             Serial.println("Analog 'Notify' enabled");
         } else {
             Serial.println("Analog 'Notify' disabled");
         }
+  if (chr->uuid == aioc.uuid) {
+    if (chr->notifyEnabled(conn_hdl)) {
     }
 }
 
 void connect_callback(uint16_t conn_handle)
 {
+  // Get the reference to current connection
+  BLEConnection* connection = Bluefruit.Connection(conn_handle);
+
   char central_name[32] = { 0 };
-  Bluefruit.Gap.getPeerName(conn_handle, central_name, sizeof(central_name));
+  connection->getPeerName(central_name, sizeof(central_name));
 
   Serial.print("Connected to ");
   Serial.println(central_name);
@@ -212,7 +215,7 @@ void connect_callback(uint16_t conn_handle)
 
     // iOS requires pairing to work, it makes sense to request security here as well
     Serial.print("Attempting to PAIR with the iOS device, please press PAIR on your phone ... ");
-    if ( Bluefruit.requestPairing() )
+    if ( Bluefruit.requestPairing(conn_handle) )
     {
       Serial.println("Done");
       Serial.println("Enabling Time Adjust Notify");
