@@ -6,12 +6,13 @@ void startBluetooth(void){
   // more SRAM required by SoftDevice
   // Note: All config***() function must be called before begin()
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
-//  Bluefruit.configServiceChanged(false);   // Not sure if this does anything useful or not...
+  Bluefruit.configServiceChanged(false);   // Not sure if this does anything useful or not...
 
   Bluefruit.begin();
   // Set max power. Accepted values are: -40, -30, -20, -16, -12, -8, -4, 0, 4
   Bluefruit.setTxPower(4);
   Bluefruit.setName("Dan nrf52 GSR");
+  Bluefruit.setName("Dan nrf GSR");
   Bluefruit.Periph.setConnectCallback(connect_callback);
   Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
   // Turn off Blue LED
@@ -65,6 +66,8 @@ void startAdv(void)
 
   // Include CTS client UUID
   Bluefruit.Advertising.addService(bleCTime);
+  Bluefruit.Advertising.addService(blebas);
+  Bluefruit.Advertising.addService(aios);
 
   // Includes name
   Bluefruit.Advertising.addName();
