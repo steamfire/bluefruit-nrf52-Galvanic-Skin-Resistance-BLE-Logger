@@ -1,33 +1,33 @@
 /*********************************************************************
- This is an example for our nRF52 based Bluefruit LE modules
+  This is an example for our nRF52 based Bluefruit LE modules
 
- Pick one up today in the adafruit shop!
+  Pick one up today in the adafruit shop!
 
- Adafruit invests time and resources providing this open source code,
- please support Adafruit and open-source hardware by purchasing
- products from Adafruit!
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
+  products from Adafruit!
 
- MIT license, check LICENSE for more information
- All text above, and the splash screen below must be included in
- any redistribution
+  MIT license, check LICENSE for more information
+  All text above, and the splash screen below must be included in
+  any redistribution
 *********************************************************************/
 
 /* RTC code is from the Adafruit arduino 1.2.0 fork of the Jeelabs RTCLib.`
- *  
- *  This sketch demonstrates Setting the RTC PCF8523 from the CTS time, 
- *  aquired from the CTS BLE service.  This is for the RTC used in the 
- *  Adalogger FeatherWing. The client Current Time Service uses the
- * BLEClientCts API(). After uploading, go to iOS setting and connect
- * to Bluefruit52, and then press PAIR.
- * 
- * Note: Currently only iOS act as a CTS server, Android does not. The
- * easiest way to test this sketch is using an iOS device.
- * 
- * Current Time Service info:
- *   https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.service.current_time.xml
- *   https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.current_time.xml
- *   https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.local_time_information.xml
- */
+
+    This sketch demonstrates Setting the RTC PCF8523 from the CTS time,
+    aquired from the CTS BLE service.  This is for the RTC used in the
+    Adalogger FeatherWing. The client Current Time Service uses the
+   BLEClientCts API(). After uploading, go to iOS setting and connect
+   to Bluefruit52, and then press PAIR.
+
+   Note: Currently only iOS act as a CTS server, Android does not. The
+   easiest way to test this sketch is using an iOS device.
+
+   Current Time Service info:
+     https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.service.current_time.xml
+     https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.current_time.xml
+     https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.local_time_information.xml
+*/
 
 
 void setupTime() {
@@ -68,21 +68,26 @@ void setupTime() {
   // Set max power. Accepted values are: -40, -30, -20, -16, -12, -8, -4, 0, 4
   Bluefruit.setTxPower(4);
   Bluefruit.setName("Dan nrf52 GSR");
-  Bluefruit.setConnectCallback(connect_callback);
-  Bluefruit.setDisconnectCallback(disconnect_callback);
-    // Turn off Blue LED
+  Bluefruit.Periph.setConnectCallback(connect_callback);
+  Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
+  // Turn off Blue LED
   Bluefruit.autoConnLed(false);
 
-    // Configure and Start the Device Information Service
+  // Configure and Start the Device Information Service
   Serial.println("Configuring the Device Information Service");
   bledis.setManufacturer("Adafruit Industries");
   bledis.setModel("Bluefruit Feather52");
   bledis.begin();
 
-    // Start the BLE Battery Service and set it to 100%
+
+  // Configure and Start BLE Uart Service
+  //bleuart.begin();
+
+  // Start the BLE Battery Service and set it to 100%
   Serial.println("Configuring the Battery Service");
   blebas.begin();
   blebas.write(100);
+
 
   // Configure CTS client
   bleCTime.begin();
@@ -92,7 +97,7 @@ void setupTime() {
   // Or change the time manually etc ...
   bleCTime.setAdjustCallback(cts_adjust_callback);
 
-  
+
   // Setup the Automation IO service using
   // BLEService and BLECharacteristic classes
   Serial.println("Configuring the Analog IO Service");
@@ -103,20 +108,21 @@ void setupTime() {
 }
 
 
-void setupAIO(){
-    aios.begin();
-      // Note: You must call .begin() on the BLEService before calling .begin() on
+void setupAIO() {
+  aios.begin();
+  // Note: You must call .begin() on the BLEService before calling .begin() on
   // any characteristic(s) within that service definition.. Calling .begin() on
   // a BLECharacteristic will cause it to be added to the last BLEService that
   // was 'begin()'ed!
 
-  aioc.setProperties(CHR_PROPS_NOTIFY);
+  aioc.setProperties(CHR_PROPS_READ | CHR_PROPS_NOTIFY);
   aioc.setPermission(SECMODE_OPEN, SECMODE_NO_ACCESS);
   aioc.setFixedLen(2);
+  aioc.setUserDescriptor("GSR");
   aioc.setCccdWriteCallback(cccd_callback);  // Optionally capture CCCD updates
   aioc.begin();
   uint8_t aiodata[2] = { 0, 0 };  // Set the first data to zero
-  aioc.notify(aiodata, 2);          
+  aioc.write(aiodata, 2);
 
 
 }
@@ -159,7 +165,7 @@ void setRTCLoop() {
 
     // If CTS service is not yet discovered
     if ( !bleCTime.discovered() && !Bluefruit.connPaired() ) {
-     ;
+      ;
     } else {
       // Get Time from iOS once per second
       // Note it is not advised to update this quickly
@@ -180,21 +186,22 @@ void setRTCLoop() {
 
 void cccd_callback(BLECharacteristic& chr, uint16_t cccd_value)
 {
-    // Display the raw request packet
-    Serial.print("CCCD Updated: ");
-    //Serial.printBuffer(request->data, request->len);
-    Serial.print(cccd_value);
-    Serial.println("");
- 
-    // Check the characteristic this CCCD update is associated with in case
-    // this handler is used for multiple CCCD records.
-    if (chr.uuid == aioc.uuid) {
-        if (chr.notifyEnabled()) {
-            Serial.println("Analog 'Notify' enabled");
-        } else {
-            Serial.println("Analog 'Notify' disabled");
-        }
+
+  // Display the raw request packet
+  Serial.print("CCCD Updated: ");
+  //Serial.printBuffer(request->data, request->len);
+  Serial.print(cccd_value);
+  Serial.println("");
+
+  // Check the characteristic this CCCD update is associated with in case
+  // this handler is used for multiple CCCD records.
+  if (chr->uuid == aioc.uuid) {
+    if (chr->notifyEnabled(conn_hdl)) {
+      Serial.println("Analog 'Notify' enabled");
+    } else {
+      Serial.println("Analog 'Notify' disabled");
     }
+  }
 }
 
 void connect_callback(uint16_t conn_handle)
@@ -204,8 +211,8 @@ void connect_callback(uint16_t conn_handle)
 
   Serial.print("Connected to ");
   Serial.println(central_name);
-  
- // Serial.print("Discovering CTS ... ");
+
+  // Serial.print("Discovering CTS ... ");
   if ( bleCTime.discover(conn_handle) )
   {
     Serial.println("Discovered CTS");
