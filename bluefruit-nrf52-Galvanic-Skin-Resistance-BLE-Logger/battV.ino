@@ -98,7 +98,7 @@ float battCheck() {
 
   */
 
-  blebas.write(battPct);
+
 
   float vbattVolts = vbat_mv / 1000;
   //delay(1000);

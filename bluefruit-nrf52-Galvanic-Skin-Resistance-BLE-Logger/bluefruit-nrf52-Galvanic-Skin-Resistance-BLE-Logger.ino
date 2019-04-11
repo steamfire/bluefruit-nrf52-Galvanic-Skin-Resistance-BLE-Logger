@@ -55,6 +55,7 @@ void setup()
   Log.notice(F("Hello.\n") );
   setupSDLog();
   setupTime();
+  startBluetooth();
   setRTCLoop();
 
   // Get a single ADC sample and throw it away
@@ -71,12 +72,11 @@ void loop()
   if (gsr_old == gsr_measured) {
     ; // do nothing special
   } else {
-    //Update the BLE Analog data 
-    uint8_t aiodata[2] = {  lowByte(gsr_measured), highByte(gsr_measured) };
-    aioc.notify(aiodata, 2);                    // Use .write for init data
+    updateAIO(gsr_measured);  // Update the bluetooth low energy available value
     gsr_old = gsr_measured;  
   }
   battVolts = battCheck();
+  updateBatt(battPct);  
   //delay(1000);
 }
 
