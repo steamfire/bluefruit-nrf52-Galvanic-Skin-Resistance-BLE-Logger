@@ -30,10 +30,13 @@ uint16_t gsr_measured = 0;
 uint16_t gsr_old = 0;
 float battVolts = 0;
 uint8_t battPct = 0;
+uint16_t conn_handleCTS = 0;
+uint8_t afterStartup = 0;
 
 // Advanced function prototypes
 void startAdv(void);
 void setupAIO(void);
+void cccd_callback(uint16_t conn_hdl, BLECharacteristic* chr, uint16_t cccd_value);
 void connect_callback(uint16_t conn_handle);
 void disconnect_callback(uint16_t conn_handle, uint8_t reason);
 
@@ -60,7 +63,8 @@ void setup()
 
   // Get a single ADC sample and throw it away
   readVBAT();
-
+  afterStartup = 1;
+  
   // Create loop2() using Scheduler to run in 'parallel' with loop()
   Scheduler.startLoop(loop2);
 }

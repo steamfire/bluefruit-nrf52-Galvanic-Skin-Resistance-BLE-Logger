@@ -63,6 +63,7 @@ void setupTime() {
 
 
 void setRTCLoop() {
+  int didConnectToiOS = 0;
   for (int i = 0; i < 10; i++) {
     //Print the RTC time before the bleCTime is checked
 
@@ -72,6 +73,7 @@ void setRTCLoop() {
     if ( !bleCTime.discovered() && !Bluefruit.connPaired() ) {
       ;
     } else {
+      didConnectToiOS = 1;
       // Get Time from iOS once per second
       // Note it is not advised to update this quickly
       // Application should use local clock and update time after
@@ -84,8 +86,10 @@ void setRTCLoop() {
     }
 
     delay(1000);
-
-
+  }
+  if (1 == didConnectToiOS) {
+     Bluefruit.disconnect(conn_handleCTS); // Disconnect from the iOS device
+     didConnectToiOS = 0;
   }
 }
 
@@ -114,6 +118,7 @@ void goCTS(uint16_t conn_handle){
       syncRTCtoCTS();
 
       Serial.println();
+
     }
 
     Serial.println();

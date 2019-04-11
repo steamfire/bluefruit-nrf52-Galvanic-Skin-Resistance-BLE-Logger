@@ -6,6 +6,7 @@ void startBluetooth(void){
   // more SRAM required by SoftDevice
   // Note: All config***() function must be called before begin()
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
+//  Bluefruit.configServiceChanged(false);   // Not sure if this does anything useful or not...
 
   Bluefruit.begin();
   // Set max power. Accepted values are: -40, -30, -20, -16, -12, -8, -4, 0, 4
@@ -79,7 +80,7 @@ void startAdv(void)
   */
   Bluefruit.Advertising.restartOnDisconnect(true);
   Bluefruit.Advertising.setInterval(32, 244);    // in unit of 0.625 ms
-  Bluefruit.Advertising.setFastTimeout(30);      // number of seconds in fast mode
+  Bluefruit.Advertising.setFastTimeout(120);      // number of seconds in fast mode
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds
 }
 
@@ -115,8 +116,9 @@ void connect_callback(uint16_t conn_handle)
   Serial.println(central_name);
 
   // Serial.print("Discovering CTS ... ");
-  if ( bleCTime.discover(conn_handle) )
+  if ( bleCTime.discover(conn_handle) && (afterStartup == 0) )
   {
+    conn_handleCTS = conn_handle;
     goCTS(conn_handle);
   }
 }
