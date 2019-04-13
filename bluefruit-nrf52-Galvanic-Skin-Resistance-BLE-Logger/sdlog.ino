@@ -35,10 +35,11 @@ void setupSDLog(void) {
     error(2);
   }
 
-  strcpy(filename, "/ANALOG00.CSV");
-  for (uint8_t i = 0; i < 100; i++) {
-    filename[7] = '0' + i / 10;
-    filename[8] = '0' + i % 10;
+  strcpy(filename, "/ANALG000.CSV");
+  for (uint16_t i = 0; i < 512; i++) {
+    filename[6] = '0' + i / 100;
+    filename[7] = '0' + i % 100 / 10;
+    filename[8] = '0' + i % 100  % 10;
     // create if does not exist, do not open existing, write, sync after write
     if (! SD.exists(filename)) {
       break;
