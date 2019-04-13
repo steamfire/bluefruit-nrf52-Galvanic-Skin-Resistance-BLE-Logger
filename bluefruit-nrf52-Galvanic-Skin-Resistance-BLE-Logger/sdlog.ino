@@ -96,50 +96,50 @@ void analogLog() {
   //  int gsr_measured = getGSR();
   //  float battVolts = battCheck();
   // set up buffer for date and time
-//  char dateBuffer[14];
+  //  char dateBuffer[14];
   char logBuffer[80];
 
   if ( xSemaphoreTakeRecursive( xSDSemaphoreMR, ( TickType_t ) 5 ) == pdTRUE ) {  // Reserve the SD card for this one
 
-  // Open the file to write the .csv legends.
-  logfile = SD.open(filename, FILE_WRITE);
-  if (logfile) {
-    //sprintf(dateBuffer, "%04u-%02u-%02u %02u:%02u:%02u, ", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
-    sprintf(logBuffer, "%04u-%02u-%02u %02u:%02u:%02u, %u, %.2f, %d%%\n", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second(),
-      gsr_measured, battVolts, battPct );
-    
-    logfile.print(logBuffer);
-    
-    /*logfile.print(dateBuffer);
+    // Open the file to write the .csv legends.
+    logfile = SD.open(filename, FILE_WRITE);
+    if (logfile) {
+      //sprintf(dateBuffer, "%04u-%02u-%02u %02u:%02u:%02u, ", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+      sprintf(logBuffer, "%04u-%02u-%02u %02u:%02u:%02u, %u, %.2f, %d%%\n", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second(),
+              gsr_measured, battVolts, battPct );
 
-    logfile.print(gsr_measured);
-    logfile.print(", ");
-    logfile.print(battVolts);
-    logfile.print(", ");
-    logfile.print(battPct);
-    logfile.println("%");
+      logfile.print(logBuffer);
 
-    */
-    logfile.close();
+      /*logfile.print(dateBuffer);
+
+        logfile.print(gsr_measured);
+        logfile.print(", ");
+        logfile.print(battVolts);
+        logfile.print(", ");
+        logfile.print(battPct);
+        logfile.println("%");
+
+      */
+      logfile.close();
       xSemaphoreGiveRecursive( xSDSemaphoreMR ); // Now free or "Give" or decrement the count for the Serial Port for others recursively.
-  }
-  Serial.print(logBuffer);
+    }
+    Serial.print(logBuffer);
 
-   // If there's a BLE UART connected, then send the latest GSR value:
-  if ( bleuart.notifyEnabled() )
-  {
-    bleuart.println(gsr_measured);
-  }
+    // If there's a BLE UART connected, then send the latest GSR value:
+    if ( bleuart.notifyEnabled() )
+    {
+      bleuart.println(gsr_measured);
+    }
 
-  
-/*
-    Serial.print(dateBuffer);
-    Serial.print(gsr_measured);
-    Serial.print(", ");
-    Serial.print(battVolts);
-    Serial.print(", ");
-    Serial.print(battPct);
-    Serial.println("%");
+
+    /*
+        Serial.print(dateBuffer);
+        Serial.print(gsr_measured);
+        Serial.print(", ");
+        Serial.print(battVolts);
+        Serial.print(", ");
+        Serial.print(battPct);
+        Serial.println("%");
     */
 
 
