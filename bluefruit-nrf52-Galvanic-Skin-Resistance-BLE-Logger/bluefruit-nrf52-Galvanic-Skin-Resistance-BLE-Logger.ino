@@ -87,8 +87,6 @@ void loop()
   }
   battVolts = battCheck();
   updateBatt(battPct);
-  //delay(1000);
-  //  uartBLELoop();
 }
 
 void loop2() {

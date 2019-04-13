@@ -103,6 +103,13 @@ void analogLog() {
   }
   Serial.print(logBuffer);
 
+   // If there's a BLE UART connected, then send the latest GSR value:
+  if ( bleuart.notifyEnabled() )
+  {
+    bleuart.println(gsr_measured);
+  }
+
+  
 /*
     Serial.print(dateBuffer);
     Serial.print(gsr_measured);

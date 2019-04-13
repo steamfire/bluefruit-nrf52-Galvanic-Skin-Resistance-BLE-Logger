@@ -64,11 +64,11 @@ void startAdv(void)
   Bluefruit.Advertising.addTxPower();
   Bluefruit.Advertising.addAppearance(BLE_APPEARANCE_GENERIC_CLOCK);
 
-
+ Bluefruit.Advertising.addService(bleuart);
   Bluefruit.Advertising.addService(bleCTime);
   Bluefruit.Advertising.addService(blebas);
   Bluefruit.Advertising.addService(aios);
-  Bluefruit.Advertising.addService(bleuart);
+ 
 
   // Includes name
   Bluefruit.Advertising.addName();

@@ -87,6 +87,21 @@ void testUartSD_3() {
 
 }
 
+void testUart_4(){
+
+  // This works to tell if the UART is connected to something
+  
+  if ( bleuart.notifyEnabled() )
+  {
+    // Forward data from our peripheral to Mobile
+    bleuart.println( "Hello Bob" );
+  }else
+  {
+    // response with no prph message
+    Serial.println(" no bob connected");
+  }  
+}
+
 void prph_bleuart_rx_callback(uint16_t conn_handle)
 {
   (void) conn_handle;
