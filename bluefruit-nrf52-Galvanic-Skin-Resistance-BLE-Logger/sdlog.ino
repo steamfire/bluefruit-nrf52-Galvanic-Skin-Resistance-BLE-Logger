@@ -36,14 +36,36 @@ void setupSDLog(void) {
   }
 
   strcpy(filename, "/ANALG000.CSV");
-  for (uint16_t i = 0; i < 512; i++) {
+  for (unsigned int i = 511; i > 0; i--)
+  {
     filename[6] = '0' + i / 100;
     filename[7] = '0' + i % 100 / 10;
     filename[8] = '0' + i % 100  % 10;
-    // create if does not exist, do not open existing, write, sync after write
-    if (! SD.exists(filename)) {
-      break;
+    // Look for the highest number filename that exists
+    if (SD.exists(filename))
+    {
+      if ( i < 511 ) // check to see if the filename is at the end of the filename range
+      { 
+        //then increment the filename back up one to the next
+        filename[6] = '0' + (i + 1) / 100;
+        filename[7] = '0' + (i + 1) % 100 / 10;
+        filename[8] = '0' + (i + 1) % 100  % 10;
+        break;
+
+      }  
+      else  // filename 511.CSV exists!
+      { // We've run out of filenames.
+        Log.fatal(F("SD card has run out of filename numbers!  Halting, blinking LED 5 times.\n") );
+        error(5);  //halt the program and blink error 5 times on the red LED
+      }
+
+
     }
+
+    // create if does not exist, do not open existing, write, sync after write
+    //if (! SD.exists(filename)) {
+    //  break;
+    //}
   }
 
   logfile = SD.open(filename, FILE_WRITE);
