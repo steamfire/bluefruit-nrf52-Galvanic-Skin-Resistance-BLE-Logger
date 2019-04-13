@@ -10,6 +10,10 @@
 #define interval_Logging_Seconds 10
 
 
+// Declare a mutex Semaphore Handle which we will use to manage shared hardware resources.
+// It will be used to ensure only only one Task is accessing this resource at any time.
+SemaphoreHandle_t xSDSemaphoreMR;
+
 /* Automation IO Service Definitions
    Automation IO Service:  0x1815
    Analog Read Characteristic: 0x2A58
@@ -43,6 +47,7 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason);
 
 void setup()
 {
+  setupRTOS();
   Serial.begin(115200);
   while ( !Serial ) delay(10);   // for nrf52840 with native usb
 

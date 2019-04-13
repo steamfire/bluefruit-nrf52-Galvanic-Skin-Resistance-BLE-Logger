@@ -75,12 +75,13 @@ void analogLog() {
   // set up buffer for date and time
   char dateBuffer[14];
 
+  if ( xSemaphoreTakeRecursive( xSDSemaphoreMR, ( TickType_t ) 5 ) == pdTRUE ) {  // Reserve the SD card for this one
+
   // Open the file to write the .csv legends.
   logfile = SD.open(filename, FILE_WRITE);
   if (logfile) {
     sprintf(dateBuffer, "%04u-%02u-%02u %02u:%02u:%02u, ", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
     logfile.print(dateBuffer);
-    Serial.print(dateBuffer);
 
     logfile.print(gsr_measured);
     logfile.print(", ");
@@ -89,7 +90,10 @@ void analogLog() {
     logfile.print(battPct);
     logfile.println("%");
     logfile.close();
+      xSemaphoreGiveRecursive( xSDSemaphoreMR ); // Now free or "Give" or decrement the count for the Serial Port for others recursively.
+  }
 
+    Serial.print(dateBuffer);
     Serial.print(gsr_measured);
     Serial.print(", ");
     Serial.print(battVolts);
