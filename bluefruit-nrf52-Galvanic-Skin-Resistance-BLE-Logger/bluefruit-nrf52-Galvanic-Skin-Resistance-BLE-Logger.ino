@@ -25,6 +25,7 @@ BLECharacteristic aioc = BLECharacteristic(0x2A58);
 BLEClientCts  bleCTime;
 BLEDis bledis;    // DIS (Device Information Service) helper class instance
 BLEBas blebas;    // BAS (Battery Service) helper class instance
+BLEUart bleuart; // uart over ble
 
 
 // Realtime Clock
@@ -69,7 +70,7 @@ void setup()
   // Get a single ADC sample and throw it away
   readVBAT();
   afterStartup = 1;
-  
+
   // Create loop2() using Scheduler to run in 'parallel' with loop()
   Scheduler.startLoop(loop2);
 }
@@ -82,18 +83,19 @@ void loop()
     ; // do nothing special
   } else {
     updateAIO(gsr_measured);  // Update the bluetooth low energy available value
-    gsr_old = gsr_measured;  
+    gsr_old = gsr_measured;
   }
   battVolts = battCheck();
-  updateBatt(battPct);  
+  updateBatt(battPct);
   //delay(1000);
+  //  uartBLELoop();
 }
 
 void loop2() {
-
   analogLog();  // save stored values to SD card
   long logDelay = interval_Logging_Seconds * 1000;
   delay(logDelay);
+
 }
 
 

@@ -1,7 +1,7 @@
 
 
-void startBluetooth(void){
-  
+void startBluetooth(void) {
+
   // Config the peripheral connection with maximum bandwidth
   // more SRAM required by SoftDevice
   // Note: All config***() function must be called before begin()
@@ -12,7 +12,6 @@ void startBluetooth(void){
   // Set max power. Accepted values are: -40, -30, -20, -16, -12, -8, -4, 0, 4
   Bluefruit.setTxPower(4);
   Bluefruit.setName("Dan nrf52 GSR");
-  Bluefruit.setName("Dan nrf GSR");
   Bluefruit.Periph.setConnectCallback(connect_callback);
   Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
   // Turn off Blue LED
@@ -26,7 +25,8 @@ void startBluetooth(void){
 
 
   // Configure and Start BLE Uart Service
-  //bleuart.begin();
+  bleuart.begin();  
+  bleuart.setRxCallback(prph_bleuart_rx_callback);
 
   // Start the BLE Battery Service and set it to 100%
   Serial.println("Configuring the Battery Service");
@@ -64,13 +64,18 @@ void startAdv(void)
   Bluefruit.Advertising.addTxPower();
   Bluefruit.Advertising.addAppearance(BLE_APPEARANCE_GENERIC_CLOCK);
 
-  // Include CTS client UUID
+
   Bluefruit.Advertising.addService(bleCTime);
   Bluefruit.Advertising.addService(blebas);
   Bluefruit.Advertising.addService(aios);
+  Bluefruit.Advertising.addService(bleuart);
 
   // Includes name
   Bluefruit.Advertising.addName();
+
+  // Secondary Scan Response packet (optional)
+  // Since there is no room for 'Name' in Advertising packet
+  Bluefruit.ScanResponse.addName();
 
   /* Start Advertising
      - Enable auto advertising if disconnected
@@ -104,6 +109,7 @@ void cccd_callback(uint16_t conn_hdl, BLECharacteristic* chr, uint16_t cccd_valu
     } else {
       Serial.println("Analog 'Notify' disabled");
     }
+
   }
 }
 
