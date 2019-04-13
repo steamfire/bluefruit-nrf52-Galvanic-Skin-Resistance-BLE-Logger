@@ -58,10 +58,9 @@ void testUartSD_2() {
 
 void testUartSD_3() {
 
+//  Print the contents of the currently open log file
+
   if ( xSemaphoreTakeRecursive( xSDSemaphoreMR, ( TickType_t ) 5 ) == pdTRUE ) {  // Reserve the SD card for this one
-
-
-
 
     // open the file. note that only one file can be open at a time,
     // so you have to close this one before opening another.
@@ -69,7 +68,7 @@ void testUartSD_3() {
 
     // if the file is available, read from it:
     if (dataFile) {
-        bleuart.println(filename);
+        bleuart.println(filename);  // Print the filename
       while (dataFile.available()) {
         uint8_t buf[64];
         int count = dataFile.readBytes(buf, sizeof(buf));
